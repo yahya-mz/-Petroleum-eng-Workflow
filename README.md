@@ -14,8 +14,9 @@ The workflow is designed for reservoir geomechanics and rock physics interpretat
 - LLM-based model recommendation
 - LLM-based response evaluation
 - Parent decision logic
-- Optional retry logic
+- Retry logic
 - Final user-facing interpretation
+- GitHub README creation/update through n8n
 
 The system is built to avoid unsupported assumptions and clearly report missing geological, fluid, mineralogical, and rock texture information.
 
@@ -23,15 +24,8 @@ The system is built to avoid unsupported assumptions and clearly report missing 
 
 The main goal of this workflow is to answer user questions such as:
 
-```text
-analyze 1050
-```
-
-or:
-
-```text
-compare 1050 and 1090
-```
+- `analyze 1050`
+- `compare 1050 and 1090`
 
 For each requested depth, the workflow:
 
@@ -45,21 +39,27 @@ For each requested depth, the workflow:
 
 ## Workflow Structure
 
-```text
-Chat Trigger
-→ Download CSV file
-→ Extract CSV data
-→ Geomechanics Calculator
-→ Download rules TXT file
-→ Extract Rules Text
-→ Model Selector LLM
-→ Response Evaluator LLM
-→ Parent Decision LLM
-→ IF Decision
-   ├── RETRY path → Model Selector Retry → Final Parent Answer
-   └── ACCEPT path → Final Parent Answer
-→ Chat Response
-```
+The workflow follows this structure:
+
+- Chat Trigger
+- Download CSV file
+- Extract CSV data
+- Geomechanics Calculator
+- Download rules TXT file
+- Extract Rules Text
+- Model Selector LLM
+- Response Evaluator LLM
+- Parent Decision LLM
+- IF Decision
+  - Retry path: Model Selector Retry → Final Parent Answer
+  - Accept path: Final Parent Answer
+- Chat Response
+
+## Workflow Diagram
+
+Click the image below to view the full n8n workflow.
+
+[![AI-Powered Reservoir Rock Physics Workflow](docs/workflow.png)](docs/workflow.png)
 
 ## Main Nodes
 
@@ -69,10 +69,8 @@ The workflow starts when a chat message is received from the user.
 
 Example inputs:
 
-```text
-analyze 1050
-compare 1050 and 1090
-```
+- `analyze 1050`
+- `compare 1050 and 1090`
 
 The workflow extracts all numeric depth values from the user message.
 
@@ -205,15 +203,8 @@ The `Parent Decision LLM` decides whether to accept the first model recommendati
 
 It outputs one of:
 
-```text
-DECISION: ACCEPT
-```
-
-or:
-
-```text
-DECISION: RETRY
-```
+- `DECISION: ACCEPT`
+- `DECISION: RETRY`
 
 The parent chooses `ACCEPT` when the model is defensible as a preliminary or reliable recommendation.
 
@@ -251,32 +242,6 @@ The final answer includes:
 8. Confidence level
 9. Missing data and limitations
 10. Final recommendation
-
-## Example Output Structure
-
-```markdown
-# Final Rock Physics Interpretation
-
-## 1. Input Summary
-
-Requested depth and matched CSV depth.
-
-## 2. Calculated Geomechanical Properties
-
-Young's modulus, bulk modulus, shear modulus, Poisson's ratio, and Vp/Vs ratio.
-
-## 3. Selected Rock Physics Model
-
-Recommended model and reason for selection.
-
-## 4. Evaluation and Risk
-
-Evaluator result, confidence level, risks, and missing data.
-
-## 5. Final Recommendation
-
-Final preliminary or reliable recommendation.
-```
 
 ## Technologies Used
 
